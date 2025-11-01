@@ -1,9 +1,14 @@
+# Task Statement
+This project explores how to systematically trade 0DTE SPY options using bear call and bull put spreads to capture intraday momentum. The goal is to build an ML- or rules-based model that identifies optimal entry and exit points, manages risk and position sizing, and determines the best strike width for each spread.
+
+The main challenge lies in balancing risk control (max loss, commissions, time constraints) with profit optimisation, while handling the high-frequency, short-duration nature of intraday options trading.
+
 # Overview and Findings
 
 ## 01 Data ingestions.ipynb
-I am posed with the difficulty of limited API calls, having limited storage and computing capacity, and the speed of calling the API. Hence, through out this project, I have decided to focus on only trading days that fall on Fridays since January 2022.
+I am posed with the difficulty of limited API calls, having limited storage and computing capacity, and the speed of calling the API. Hence, throughout this project, I have decided to focus on only **trading days that fall on Fridays** since January 2022. Options data (and trading) is also only done at a **5-min interval** from 0930 to 1500H Eastern Time (ET).
 
-The class defined in `src/DataUpdateModule.py`, allows a simple call to retrieve and save all the necessary data for any trading day. This class is utilised in this notebook.
+The class defined in [`src/DataUpdateModule.py`](./src/DataUpdateModule.py), allows a simple call to retrieve and save all the necessary data for any trading day. This class is utilised in this notebook.
 
 ## 02 EDA.ipynb
 I started the analysis by visualising some of the intraday trading data for both the underlying stock and the options.
@@ -68,6 +73,8 @@ Example configurations:
 }
 ```
 
+The strategy is defined in code in [`src/Strategy`](./src/Strategy). The trading mechanism, environment and configurations are defined in [`src/DayTrade`](./src/DayTrade), it is named as such because every run of the DayTrade.trade() method runs a full day of trading.
+
 The following chart shows the pnl from each "model" in the four Fridays of Jan'22. Each line represents a combination of the configurations set above (e.g. fast=5, slow_mult=3, rsi_threshold=60, opt_leg1_dollar_from_atm=0, opt_leg2_dollar_from_leg1=1, stoploss_pct_of_maxprofit=0.5)
 
 <img src="./attachments/03 trade analysis 1.png" width="600"/>
@@ -90,5 +97,23 @@ The trend is also observable through PDP for the regions in the hyperparameter s
 
 Using this information, I further refined the choices I am providing in the hyperparameter grid.
 
-## 04 Walk-forward test.ipynb
+## 04 Walk-forward test 2022.ipynb
+
+In the walk-forward test, I chose the "best" model by testing each model with the market activity of previous month, in order to determine which model to use for the current month of interest. (e.g. At the beginning of June, before market opens, I test each of the 400+ models with the trading days in May, then select the "best" model say, model #52 which will be used to trade June)
+
+Selection of the "best" model: In my current implementation, I select the model that has produced the highest $Average(PnL) / StdDev(PnL)$ across different trading days in the training month. The result could be improved if we have traded more days rather than only Fridays.
+
+<img src="./attachments/04 walk-fwd 1.png" width="600"/>
+
+The equity curve for Feb'22 to Dec'22 seems to produce consistent returns only in certain months. At this juncture, the ideal action is to investigate the data to identify the driver of profit - which we should have enough data for as there are two very clear regimes (one of breakeven P&L and one of consistent profits).
+
+I shall keep this on a to-do list given the lack of time for this task.
+
+<img src="./attachments/04 walk-fwd 3.png" width="600"/>
+
+The PDP for 2022 (excluding Jan) continue to suggest a similar relationship between the hyperparameters and the eventual profit as per what is suggested in the previous notebook investigating only Jan'22 data.
+
+No changes were made to the strategy at this point.
+
+## Walk-forward test full.ipynb
 
