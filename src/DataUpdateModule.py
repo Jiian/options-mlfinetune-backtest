@@ -75,31 +75,39 @@ class DataUpdateModule:
                 "strike", "stockPrice", "callDelta", "putDelta", 'callMidIv', 'putMidIv',
                 'callOpenInterest', 'callVolume', 'callBidSize', 'callAskSize', 'callBidPrice', 'callAskPrice',
                 'putOpenInterest', 'putVolume', 'putBidSize', 'putAskSize', 'putBidPrice', 'putAskPrice'
-            ]].assign(time = trade_minute_est)
+            ]].assign(time = trade_minute_est.replace(tzinfo=ZoneInfo("America/New_York")))
         return df_out
     
-    def update_data(self, trade_date):
-        # Update stock data
-        df_stock = self._get_stock_data(
-            from_est = trade_date.replace(hour = 7, minute = 30, second = 0),
-            to_est = trade_date.replace(hour = 15, minute = 0, second = 0)
-        )
-        print(f"Stock data: {len(df_stock)} rows")
-        # Update options data
-        start = trade_date.replace(hour = 9, minute = 30, second = 0)
-        end = trade_date.replace(hour = 15, minute = 0, second = 0)
-        delta = relativedelta(minutes = self.options_interval_minutes)
-        dfs = list()
-        while start <= end:
-            df = self._get_options_data(trade_minute_est = start)
-            print("*", end="", flush=True)
-            dfs.append(df)
-            start += delta
-        df_options = pd.concat(dfs, axis=0)
-        print(f"\nOptions data: {len(df_options)} rows")
-        # Save data
-        df_stock.to_csv(f"data/stock_data_{trade_date.strftime('%Y%m%d')}.csv")
-        df_options.to_csv(f"data/options_data_{trade_date.strftime('%Y%m%d')}.csv")
+    def update_data(self, trade_date, update_stock = True, update_options = True):
+        df_stock = None
+        df_options = None
+        
+        if update_stock:
+            # Update stock data
+            df_stock = self._get_stock_data(
+                from_est = trade_date.replace(hour = 7, minute = 30, second = 0),
+                to_est = trade_date.replace(hour = 15, minute = 0, second = 0)
+            )
+            print(f"Stock data: {len(df_stock)} rows")
+            # Save data
+            df_stock.to_csv(f"data/stock_data_{trade_date.strftime('%Y%m%d')}.csv")
+
+        if update_options:
+            # Update options data
+            start = trade_date.replace(hour = 9, minute = 30, second = 0)
+            end = trade_date.replace(hour = 15, minute = 1, second = 0)
+            delta = relativedelta(minutes = self.options_interval_minutes)
+            dfs = list()
+            while start <= end:
+                df = self._get_options_data(trade_minute_est = start)
+                print("*", end="", flush=True)
+                dfs.append(df)
+                start += delta
+            df_options = pd.concat(dfs, axis=0)
+            print(f"\nOptions data: {len(df_options)} rows")
+            # Save data
+            df_options.to_csv(f"data/options_data_{trade_date.strftime('%Y%m%d')}.csv")
+
         return df_stock, df_options
     
     def read_data(self, trade_date):
