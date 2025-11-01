@@ -6,15 +6,15 @@ from itertools import product
 class Strategy:
     def __init__(self):
         self.params_grid = {
-            "fast": [5, 10, 20], #sma|rsi|macd
-            "slow_mult": [2, 3, 5], # sma|rsi|macd, for ATR also
+            "fast": [5, 10, 20, 30], #sma|rsi|macd
+            "slow_mult": [2, 3], # sma|rsi|macd, for ATR also
 
             "rsi_threshold": [60, 70], #rsi only
 
             # used in trade env
             "opt_leg1_dollar_from_atm" : [0, 1, 2, 5],
-            "opt_leg2_dollar_from_leg1" : [1, 2, 5, 10, 15],
-            "stoploss_pct_of_maxprofit" : [.1, .2, .5, .8, 1.],
+            "opt_leg2_dollar_from_leg1" : [1, 2, 5, 10],
+            "stoploss_pct_of_maxprofit" : [.1, .5],
         }
 
         self.tech_indicators = None

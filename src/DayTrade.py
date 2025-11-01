@@ -68,7 +68,18 @@ class DayTrade:
                         position = 0
                 case _:
                     raise ValueError("Invalid position value.")
-        trades = pd.DataFrame(trades)
+        if position == 1:
+            trades[-1] |= self.close_long_trade(df_options_instance, latest_trade, reason = "end_of_time")
+        elif position == -1:
+            trades[-1] |= self.close_short_trade(df_options_instance, latest_trade, reason = "end_of_time")
+        if len(trades) > 0:
+            trades = pd.DataFrame(trades)
+        else:
+            trades = pd.DataFrame(columns = ['entry_time', 'direction', 'entry_spot', 'entry_atm_strike',
+                'leg1_strike', 'leg2_strike', 'entry_leg1_price', 'entry_leg2_price',
+                'entry_unit_spread', 'entry_unit_maxloss', 'contracts', 'stoploss',
+                'exit_time', 'exit_spot', 'exit_leg1_price', 'exit_leg2_price',
+                'exit_unit_spread', 'exit_reason', 'unit_pnl_gross', 'pnl'])
         return trades
 
     # Helper functions
@@ -168,7 +179,6 @@ class DayTrade:
             assert unit_spread > 0.01, "The spread is not positive."
             assert leg1.loc["putAskPrice"] - leg2.loc["putBidPrice"] < stoploss, f"Unfavourable spread for entry: Entry spread: {unit_spread}, Exit spread: {leg1.loc['putAskPrice'] - leg2.loc['putBidPrice']}, Stoploss: {stoploss}"
         except AssertionError as e:
-            print(e)
             return None
 
         # Metadata
@@ -210,7 +220,6 @@ class DayTrade:
             assert unit_spread > 0.01, "The spread is not positive."
             assert leg1.loc["callAskPrice"] - leg2.loc["callBidPrice"] < stoploss, f"Unfavourable spread for entry: Entry spread: {unit_spread}, Exit spread: {leg1.loc['callAskPrice'] - leg2.loc['callBidPrice']}, Stoploss: {stoploss}"
         except AssertionError as e:
-            print(e)
             return None
 
         # Metadata

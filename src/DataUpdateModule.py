@@ -11,7 +11,7 @@ from eodhd import APIClient
 
 class DataUpdateModule:
     
-    def __init__(self, options_interval_minutes = 10):
+    def __init__(self, options_interval_minutes = 5):
         # Get tokens
         load_dotenv()
         self.TOKEN_EODHD = os.getenv('TOKEN_EODHD')
