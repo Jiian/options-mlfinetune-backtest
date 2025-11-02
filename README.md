@@ -115,5 +115,42 @@ The PDP for 2022 (excluding Jan) continue to suggest a similar relationship betw
 
 No changes were made to the strategy at this point.
 
-## Walk-forward test full.ipynb
+## 05 Walk-forward test full.ipynb
 
+Walk forward test is being done for the period of Feb'22 to Oct'25, for each trading Friday, and trading of options are only done at 5-min intervals. Again, these are constraints set by resources rather than practical considerations.
+
+Results could be improved practically if trading is done daily rather than only once per week.
+- In this case, risk size hence entry size can be reduced (to minimise slippage) and still attain better returns.
+- This assumes trading behaviour does not change significantly from Fridays to non-Friday trading days.
+
+Equity Curve for Friday Tradings
+<img src="./attachments/05 walk-fwd full 1.png" width="600"/>
+
+Equity curve shows slow consistent returns for most part. The tail end (final 30 weeks) of the curve experienced some major drawdown, possibly driven by President Trump's frequent and unpredictable policies.
+
+# 06 Results analysis.ipynb
+
+Through the above steps of trading, testing and interpreting the RandomForest-based results, the final strategy used has the following parameters:
+```
+{
+    # used in TA
+    "fast": [20, 30], #sma|rsi|macd
+    "slow_mult": [3], # sma|rsi|macd, for ATR also
+    "rsi_threshold": [70], #rsi only
+
+    # used in trade env
+    "opt_leg1_dollar_from_atm" : [2, 5],
+    "opt_leg2_dollar_from_leg1" : [5, 10],
+    "stoploss_pct_of_maxprofit" : [.1, .5, 1.],
+}
+```
+
+The over-arching strategy remains unchanged.
+
+
+
+
+
+
+## Limitations
+1. It is clear that the hypothetical entry sizes intended are large compared to the market liquidity. In this project, I have assumed that the complete position can be entered at the same price. While a more practical approach may be to break the entry down - and enter at several strikes.

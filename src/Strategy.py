@@ -6,17 +6,16 @@ from itertools import product
 class Strategy:
     def __init__(self):
         self.params_grid = {
-            "fast": [5, 10, 20, 30], #sma|rsi|macd
-            "slow_mult": [3, 4], # sma|rsi|macd, for ATR also
+            "fast": [20, 30], #sma|rsi|macd
+            "slow_mult": [3], # sma|rsi|macd, for ATR also
 
-            "rsi_threshold": [70, 80], #[60, 70], #rsi only
+            "rsi_threshold": [70], #rsi only
 
             # used in trade env
-            "opt_leg1_dollar_from_atm" : [0, 2, 5],
-            "opt_leg2_dollar_from_leg1" : [1, 5, 10],
+            "opt_leg1_dollar_from_atm" : [2, 5],
+            "opt_leg2_dollar_from_leg1" : [5, 10],
             "stoploss_pct_of_maxprofit" : [.1, .5, 1.],
         }
-
         self.tech_indicators = None
         self.models = [{list(self.params_grid.keys())[i] : x[i] for i in range(len(x))} for x in list(product(*self.params_grid.values()))]
 

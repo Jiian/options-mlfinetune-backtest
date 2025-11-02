@@ -12,6 +12,7 @@ class DayTrade:
         self.max_risk = max_risk
         self.AUM = AUM
 
+        self.strategy = strategy
         enter_long, exit_long, enter_short, exit_short = strategy.entry_exit_signals(model_num = model_num)
         self.enter_long = enter_long
         self.exit_long = exit_long
@@ -25,6 +26,8 @@ class DayTrade:
         position = 0
         trades = list()
         tradeable_instances = list(self.df_options.loc[:, "time"].unique())
+        tradeable_instances = list(set(tradeable_instances).intersection(set(self.strategy.tech_indicators.index)))
+        tradeable_instances.sort()
         prev_instance = tradeable_instances[0] - relativedelta(minutes = self.interval)
         for trade_instance in tradeable_instances:
             df_options_instance = self.df_options[self.df_options["time"] == trade_instance]
@@ -48,6 +51,8 @@ class DayTrade:
                                 position = -1
                 case 1:
                     latest_trade = trades[-1]
+                    if (latest_trade["leg1_strike"] not in df_options_instance.loc[:, "strike"].unique()) or (latest_trade["leg2_strike"] not in df_options_instance.loc[:, "strike"].unique()):
+                        continue
                     # exit long criteria
                     exit_signal = self.exit_long[(self.exit_long.index < trade_instance) & (self.exit_long.index >= prev_instance)].any()
                     # stoploss hit
@@ -58,6 +63,8 @@ class DayTrade:
                         position = 0
                 case -1:    
                     latest_trade = trades[-1]
+                    if (latest_trade["leg1_strike"] not in df_options_instance.loc[:, "strike"].unique()) or (latest_trade["leg2_strike"] not in df_options_instance.loc[:, "strike"].unique()):
+                        continue
                     # exit short criteria
                     exit_signal = self.exit_short[(self.exit_short.index < trade_instance) & (self.exit_short.index >= prev_instance)].any()
                     # stoploss hit
@@ -145,10 +152,17 @@ class DayTrade:
         return metadata_update
 
     def check_long_stoploss(self, df_options_instance, latest_trade, params):
-        stoploss = latest_trade['stoploss']
-        leg1_price = df_options_instance[df_options_instance.loc[:, "strike"] == latest_trade['leg1_strike']].iloc[0].loc["putAskPrice"]
-        leg2_price = df_options_instance[df_options_instance.loc[:, "strike"] == latest_trade['leg2_strike']].iloc[0].loc["putBidPrice"]
-        current_price = leg1_price - leg2_price
+        try:
+            stoploss = latest_trade['stoploss']
+            leg1_price = df_options_instance[df_options_instance.loc[:, "strike"] == latest_trade['leg1_strike']].iloc[0].loc["putAskPrice"]
+            leg2_price = df_options_instance[df_options_instance.loc[:, "strike"] == latest_trade['leg2_strike']].iloc[0].loc["putBidPrice"]
+            current_price = leg1_price - leg2_price
+        except Exception as e:
+            print(latest_trade['leg1_strike'])
+            print(df_options_instance.loc[:, "strike"].unique())
+            print(df_options_instance.loc[:, "time"].unique())
+            print(e)
+
         return current_price >= stoploss
 
     def check_short_stoploss(self, df_options_instance, latest_trade, params):
@@ -170,7 +184,7 @@ class DayTrade:
         # Positioning
         unit_spread = leg1.loc["putBidPrice"] - leg2.loc["putAskPrice"]
         unit_maxloss = leg1.loc["strike"] - leg2.loc["strike"] - unit_spread
-        contracts = int(max_risk_dollars / 100 / unit_maxloss * 0.50) # set a 50% cap on max_risk - while avoiding large contract sizes
+        contracts = int(max_risk_dollars / 100 / unit_maxloss * 0.75) # set a 75% cap on max_risk - while avoiding large contract sizes
         stoploss = unit_spread + unit_spread * params["stoploss_pct_of_maxprofit"]
 
         # Validations
@@ -211,7 +225,7 @@ class DayTrade:
         # Positioning
         unit_spread = leg1.loc["callBidPrice"] - leg2.loc["callAskPrice"]
         unit_maxloss = -(leg1.loc["strike"] - leg2.loc["strike"]) - unit_spread
-        contracts = int(max_risk_dollars / 100 / unit_maxloss * 0.50) # set a 50% cap on max_risk - while avoiding large contract sizes
+        contracts = int(max_risk_dollars / 100 / unit_maxloss * 0.75) # set a 75% cap on max_risk - while avoiding large contract sizes
         stoploss = unit_spread + unit_spread * params["stoploss_pct_of_maxprofit"]
 
         # Validations

@@ -85,7 +85,7 @@ class DataUpdateModule:
         if update_stock:
             # Update stock data
             df_stock = self._get_stock_data(
-                from_est = trade_date.replace(hour = 7, minute = 30, second = 0),
+                from_est = trade_date.replace(hour = 6, minute = 30, second = 0),
                 to_est = trade_date.replace(hour = 15, minute = 0, second = 0)
             )
             print(f"Stock data: {len(df_stock)} rows")
