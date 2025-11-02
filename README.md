@@ -147,10 +147,27 @@ Through the above steps of trading, testing and interpreting the RandomForest-ba
 
 The over-arching strategy remains unchanged.
 
+### Training Data
+We first look at the compiled training data. (These are not the actual trades, but the calculations from the evaluation of best model part; i.e. each data point is one day of trading by one configuration of the strategy)
 
+<img src="./attachments/06 results 1.png" width="600"/>
 
+P&L looks generally symmetric for the most part, but exists big outliers, mostly to the upside.
 
+<img src="./attachments/06 results 2.png" width="600"/>
 
+The P&L across different parameters look generally equal. But there are clear differences when P&L is plotted against different time dimensions as seen in the final two graphs.
+
+### Trades
+
+This section shows the results of actual trades (rather than training data).
+
+<img src="./attachments/06 results 3.png" width="600"/>
+<img src="./attachments/06 results 4.png" width="600"/>
+
+It is found that most of the P&L is generated when a position is held to the "end of time" which refers to 1500 ET. In our implementation, any position that is open at the end of 1500 ET each day will be forced to close at prevailing market prices. 
+
+While these positions generally generate profit, it is clear that the exit strategy should be refined to achieve a more controllable exit. The current exit of only considering RSI versus a fixed threshold prove to be too simple and ineffective in identifying the end of a trend.
 
 ## Limitations
 1. It is clear that the hypothetical entry sizes intended are large compared to the market liquidity. In this project, I have assumed that the complete position can be entered at the same price. While a more practical approach may be to break the entry down - and enter at several strikes.
