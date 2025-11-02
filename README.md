@@ -124,6 +124,7 @@ Results could be improved practically if trading is done daily rather than only 
 - This assumes trading behaviour does not change significantly from Fridays to non-Friday trading days.
 
 Equity Curve for Friday Tradings
+
 <img src="./attachments/05 walk-fwd full 1.png" width="600"/>
 
 Equity curve shows slow consistent returns for most part. The tail end (final 30 weeks) of the curve experienced some major drawdown, possibly driven by President Trump's frequent and unpredictable policies.
