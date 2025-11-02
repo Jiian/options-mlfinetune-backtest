@@ -171,12 +171,15 @@ While these positions generally generate profit, it is clear that the exit strat
 ## Limitations
 1. It is clear that the hypothetical entry sizes intended are large compared to the market liquidity. In this project, I have assumed that the complete position can be entered at the same price. While a more practical approach may be to break the entry down - and enter at several strikes.
 
-## Further Improvement/Investigation
+## Areas of Improvement/Investigation
 
 ### Analyses
-1. Entry time of the day.
+1. Analyse distribution of entry times of the day.
 2. Performance of best model in the past month vs current month.
+3. More analyses on options market activity.
 
 ### Implementation
 1. Consider slippage and implementation of entry at multiple strikes.
 2. Refine exit strategy.
+3. Implement daily trading and higher frequency (e.g. 1 min) trading.
+4. Parallelisation of trading step.
