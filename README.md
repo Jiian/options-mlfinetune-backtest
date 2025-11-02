@@ -113,8 +113,6 @@ I shall keep this on a to-do list given the lack of time for this task.
 
 The PDP for 2022 (excluding Jan) continue to suggest a similar relationship between the hyperparameters and the eventual profit as per what is suggested in the previous notebook investigating only Jan'22 data.
 
-No changes were made to the strategy at this point.
-
 ## 05 Walk-forward test full.ipynb
 
 Walk forward test is being done for the period of Feb'22 to Oct'25, for each trading Friday, and trading of options are only done at 5-min intervals. Again, these are constraints set by resources rather than practical considerations.
